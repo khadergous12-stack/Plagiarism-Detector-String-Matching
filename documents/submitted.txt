@@ -1,0 +1,15 @@
+Artificial intelligence is a broad field that encompasses many techniques and approaches.
+Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.
+It focuses on developing computer programs that can access data and use it to learn for themselves.
+Scientists use various techniques to build intelligent systems that can solve complex real world problems.
+Deep learning is a subfield of machine learning that uses neural networks with many layers to analyze various factors of data.
+Neural networks are inspired by the structure and function of the human brain and are widely used in computer vision.
+Data preprocessing is an important step in the machine learning pipeline that involves transforming raw data into a clean and useful format.
+In supervised learning the algorithm is given labeled training examples and learns to map inputs to correct outputs.
+Supervised learning is a type of machine learning where the algorithm is trained on labeled data to predict outcomes for new data.
+The confusion matrix is a table used to evaluate the performance of a classification algorithm on a set of test data for which true values are known.
+Overfitting occurs when a machine learning model performs well on training data but poorly on unseen test data.
+Transfer learning is a technique where knowledge gained from solving one problem is applied to a different but related problem.
+Cross validation is a technique used to evaluate how well a machine learning model will generalize to an independent dataset.
+Modern AI systems are becoming increasingly capable of performing tasks that previously required human intelligence.
+Regularization is a technique used to prevent overfitting by adding a penalty term to the loss function of the model.

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PlagiaGuard — Plagiarism Detector v2</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+:root{--bg:#06080a;--bg2:#0a0d10;--bg3:#0f1318;--surface:#141a21;--surface2:#1a2129;--border:#1e2730;--border2:#263040;--text:#dce6f0;--text2:#7d9ab5;--text3:#3d5269;--accent:#00e5ff;--green:#00e676;--amber:#ffb300;--red:#ff5252;--purple:#d500f9;--mono:'JetBrains Mono',monospace;--display:'Syne',sans-serif;--r:6px;--tr:all 0.16s ease}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.logo{font-family:var(--display);font-size:1.1rem;font-weight:800;letter-spacing:-0.02em}.logo span{color:var(--accent)}
+.badge{font-size:0.58rem;font-weight:700;background:var(--accent);color:#000;padding:2px 6px;border-radius:3px;margin-left:8px}
+.nav{display:flex;gap:2px}
+.nb{font-family:var(--mono);font-size:0.7rem;color:var(--text2);background:none;border:none;padding:5px 11px;border-radius:var(--r);cursor:pointer;transition:var(--tr)}
+.nb:hover{color:var(--text);background:var(--surface)}.nb.active{color:var(--accent);background:rgba(0,229,255,0.08)}
+.tr-right{display:flex;align-items:center;gap:10px;font-size:0.65rem;color:var(--text3)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.main{display:flex;flex:1}
+.sidebar{width:210px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:14px 0;display:flex;flex-direction:column}
+.sl{font-size:0.58rem;font-weight:700;color:var(--text3);letter-spacing:0.12em;padding:0 14px;margin-bottom:5px}
+.si{display:flex;align-items:center;gap:9px;padding:6px 14px;font-size:0.72rem;color:var(--text2);cursor:pointer;transition:var(--tr);border-left:2px solid transparent}
+.si:hover{color:var(--text);background:var(--surface)}.si.active{color:var(--accent);background:rgba(0,229,255,0.06);border-left-color:var(--accent)}
+.sb-bottom{margin-top:auto;padding:14px;border-top:1px solid var(--border);font-size:0.62rem;color:var(--text3)}
+.content{flex:1;overflow:auto;padding:18px 22px}
+.btn{font-family:var(--mono);font-size:0.7rem;font-weight:700;padding:7px 16px;border-radius:var(--r);border:none;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#000}.btn-primary:hover{background:#33eeff;box-shadow:0 0 14px rgba(0,229,255,0.3)}
+.btn-primary:disabled{background:var(--border2);color:var(--text3);cursor:not-allowed;box-shadow:none}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border2)}.btn-secondary:hover{color:var(--text)}
+.btn-purple{background:rgba(213,0,249,0.12);color:var(--purple);border:1px solid rgba(213,0,249,0.25)}.btn-purple:hover{background:rgba(213,0,249,0.22)}
+.spin{animation:spin 0.8s linear infinite;display:inline-block}@keyframes spin{to{transform:rotate(360deg)}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.pt{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.pb{padding:14px}
+.score-big{font-family:var(--display);font-size:3.5rem;font-weight:800;line-height:1;letter-spacing:-0.03em}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px}
+.sc{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--sc-color,var(--accent));opacity:0.7}
+.sc-label{font-size:0.56rem;color:var(--text3);letter-spacing:0.1em;font-weight:700;margin-bottom:5px}
+.sc-val{font-family:var(--display);font-size:1.4rem;font-weight:800;color:var(--sc-color,var(--text));letter-spacing:-0.02em}
+.bar-wrap{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width 0.8s cubic-bezier(.4,0,.2,1)}
+.tag{display:inline-flex;align-items:center;padding:1px 6px;border-radius:3px;font-size:0.58rem;font-weight:700}
+.tag-blue{background:rgba(0,229,255,0.1);color:var(--accent);border:1px solid rgba(0,229,255,0.2)}
+.tag-green{background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2)}
+.tag-red{background:rgba(255,82,82,0.1);color:var(--red);border:1px solid rgba(255,82,82,0.2)}
+.tag-amber{background:rgba(255,179,0,0.1);color:var(--amber);border:1px solid rgba(255,179,0,0.2)}
+.tag-gray{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.table{width:100%;border-collapse:collapse}
+.table th{text-align:left;padding:5px 10px;font-size:0.58rem;letter-spacing:0.1em;font-weight:700;color:var(--text3);border-bottom:1px solid var(--border);text-transform:uppercase}
+.table td{padding:6px 10px;font-size:0.7rem;color:var(--text2);border-bottom:1px solid var(--border);transition:var(--tr)}
+.table tr:hover td{background:var(--bg3);color:var(--text)}.table tr:last-child td{border-bottom:none}
+.match-row{padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.68rem}
+.match-row:last-child{border-bottom:none}
+.match-copied{background:rgba(255,82,82,0.04);border-left:2px solid var(--red)}
+.match-label{font-size:0.58rem;font-weight:700;margin-bottom:3px}
+.match-text{color:var(--text2);line-height:1.5}
+.notif{position:fixed;bottom:18px;right:18px;z-index:9999;padding:9px 14px;border-radius:var(--r);font-size:0.7rem;font-weight:600;display:flex;align-items:center;gap:7px;animation:sli 0.3s ease;box-shadow:0 6px 20px rgba(0,0,0,0.5)}
+@keyframes sli{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+.notif-ok{background:rgba(0,230,118,0.12);border:1px solid rgba(0,230,118,0.35);color:var(--green)}
+.notif-err{background:rgba(255,82,82,0.12);border:1px solid rgba(255,82,82,0.35);color:var(--red)}
+.notif-info{background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);color:var(--accent)}
+.empty{display:flex;flex-direction:column;align-items:center;padding:36px;color:var(--text3);font-size:0.7rem;gap:6px}
+.empty-icon{font-size:1.8rem;opacity:0.25}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.log-wrap{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px;font-size:0.62rem;max-height:160px;overflow-y:auto}
+.log-line{display:flex;gap:7px;margin-bottom:2px}
+.lt{color:var(--text3);flex-shrink:0}.lok{color:var(--green)}.lerr{color:var(--red)}.linf{color:var(--accent)}
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);background-size:200% 100%;animation:shim 1.2s infinite;border-radius:var(--r)}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.field-label{font-size:0.58rem;color:var(--text3);letter-spacing:0.1em;font-weight:700;margin-bottom:5px}
+textarea,input.text-inp{width:100%;font-family:var(--mono);font-size:0.68rem;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:var(--r);padding:8px;outline:none;transition:var(--tr)}
+textarea:focus,input.text-inp:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,0.08)}
+@media(max-width:860px){.sidebar{display:none}.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const nowT=()=>new Date().toLocaleTimeString('en-US',{hour12:false});
+function useNotif(){const[n,setN]=useState(null);const show=(m,t='info')=>{setN({m,t});setTimeout(()=>setN(null),3000)};return[n,show];}
+function useLogs(){const[l,setL]=useState([]);const add=(m,t='info')=>setL(x=>[...x.slice(-49),{time:nowT(),m,t}]);return[l,add];}
+const SC=s=>s>=75?'var(--red)':s>=40?'var(--amber)':s>=15?'#ff8c00':'var(--green)';
+function VTag({v}){const c=v?.includes('HIGH')?'tag-red':v?.includes('MODERATE')?'tag-amber':v?.includes('LOW')?'tag-amber':'tag-green';return <span className={`tag ${c}`}>{v||'—'}</span>;}
+function ScoreCards({data}){
+  if(!data)return<div className="score-grid">{[1,2,3,4,5].map(i=><div key={i} className="skeleton" style={{height:70}}/>)}</div>;
+  const c=data.candidates?.[0];
+  const items=[
+    {l:'KMP EXACT',v:`${c?.kmp_pct||0}%`,col:'var(--accent)',b:(c?.kmp_pct||0)/100},
+    {l:'WINNOWING',v:`${c?.winnow_pct||0}%`,col:'var(--purple)',b:(c?.winnow_pct||0)/100},
+    {l:'MINHASH/LSH',v:`${c?.lsh_sim||0}%`,col:'#00bcd4',b:(c?.lsh_sim||0)/100},
+    {l:'TF-IDF',v:`${c?.tfidf||0}%`,col:'var(--amber)',b:(c?.tfidf||0)/100},
+    {l:'N-GRAM(4)',v:`${c?.ngram||0}%`,col:'var(--green)',b:(c?.ngram||0)/100},
+  ];
+  return<div className="score-grid">{items.map((x,i)=><div key={i} className="sc" style={{'--sc-color':x.col}}><div className="sc-label">{x.l}</div><div className="sc-val">{x.v}</div><div className="bar-wrap"><div className="bar-fill" style={{width:`${Math.min(100,x.b*100)}%`,background:x.col}}/></div></div>)}</div>;
+}
+function MatchList({data}){
+  if(!data)return<div className="empty"><div className="empty-icon">🔍</div><div>Paste text and click Analyze</div></div>;
+  const c=data.candidates?.[0];
+  if(!c?.kmp_matches?.length)return<div className="empty"><div>No matched sentences detected</div></div>;
+  return<div>{c.kmp_matches.map((s,i)=><div key={i} className="match-row match-copied"><div className="match-label" style={{color:'var(--red)'}}>⚠ KMP MATCH #{i+1}</div><div className="match-text">"{s}"</div></div>)}</div>;
+}
+function CandTable({data}){
+  if(!data?.candidates?.length)return<div className="empty"><div>No results</div></div>;
+  return<table className="table"><thead><tr><th>#</th><th>Document</th><th>Score</th><th>KMP</th><th>Winnow</th><th>TF-IDF</th><th>Verdict</th></tr></thead><tbody>{data.candidates.map((c,i)=><tr key={i}><td style={{color:'var(--text3)'}}>{i+1}</td><td><span className="tag tag-blue">{c.doc_id}</span></td><td><span style={{fontWeight:700,color:SC(c.score)}}>{c.score}%</span></td><td>{c.kmp_pct}%</td><td>{c.winnow_pct}%</td><td>{c.tfidf}%</td><td><VTag v={data.verdict}/></td></tr>)}</tbody></table>;
+}
+function TLog({logs}){
+  const ref=useRef(null);
+  useEffect(()=>{if(ref.current)ref.current.scrollTop=ref.current.scrollHeight;},[logs]);
+  return<div className="log-wrap" ref={ref}>{logs.length===0&&<div style={{color:'var(--text3)'}}>$ awaiting analysis...</div>}{logs.map((l,i)=><div key={i} className="log-line"><span className="lt">{l.time}</span><span className={l.t==='ok'?'lok':l.t==='err'?'lerr':'linf'}>{l.t==='ok'?'✓':l.t==='err'?'✗':'›'}</span><span style={{color:'var(--text2)'}}>{l.m}</span></div>)}</div>;
+}
+function IndexPanel({log,show}){
+  const[id,setId]=useState('');const[txt,setTxt]=useState('');const[docs,setDocs]=useState([]);const[loading,setLoading]=useState(false);
+  const loadDocs=async()=>{try{const r=await fetch('/docs_list');const d=await r.json();setDocs(d.docs||[]);}catch(_){}};
+  useEffect(()=>{loadDocs();},[]);
+  async function idx(){
+    if(!id||!txt){show('Enter doc ID and text','err');return;}
+    setLoading(true);log(`Indexing: ${id}`,'info');
+    try{const r=await fetch('/index',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({doc_id:id,text:txt})});const d=await r.json();log(`Indexed ${id} — ${d.indexed_docs} total`,'ok');show(`✓ Indexed: ${id}`,'ok');setId('');setTxt('');loadDocs();}catch(e){log(`Error: ${e.message}`,'err');}
+    setLoading(false);
+  }
+  return<div>
+    <div style={{fontSize:'0.62rem',color:'var(--text3)',marginBottom:12}}>Index reference documents. The analyzer compares submissions against all indexed documents.</div>
+    <div style={{marginBottom:10}}><div className="field-label">DOCUMENT ID</div><input className="text-inp" style={{width:200}} value={id} onChange={e=>setId(e.target.value)} placeholder="my_doc_id"/></div>
+    <div style={{marginBottom:10}}><div className="field-label">DOCUMENT TEXT</div><textarea rows={6} value={txt} onChange={e=>setTxt(e.target.value)} placeholder="Paste reference document..."/></div>
+    <div style={{display:'flex',gap:8}}><button className="btn btn-primary" onClick={idx} disabled={loading}>{loading?<span className="spin">⟳</span>:'+'} {loading?'Indexing...':'Index Document'}</button><button className="btn btn-secondary" onClick={loadDocs}>↺</button></div>
+    <div style={{marginTop:14}}><div style={{fontSize:'0.6rem',color:'var(--text3)',letterSpacing:'0.1em',fontWeight:700,marginBottom:6}}>INDEXED CORPUS ({docs.length})</div>{docs.map(d=><span key={d} style={{display:'inline-block',margin:'2px'}} className="tag tag-blue">{d}</span>)}{!docs.length&&<div style={{color:'var(--text3)',fontSize:'0.65rem'}}>No documents yet</div>}</div>
+  </div>;
+}
+function WhatIfPanel({log,show}){
+  const[docId,setDocId]=useState('extra');const[docTxt,setDocTxt]=useState('');const[subTxt,setSubTxt]=useState('');const[result,setResult]=useState(null);const[loading,setLoading]=useState(false);
+  async function run(){
+    if(!subTxt){show('Enter submission text','err');return;}
+    setLoading(true);log('Running what-if...','info');
+    try{const body={text:subTxt};if(docTxt)body.extra_doc={doc_id:docId,text:docTxt};const r=await fetch('/whatif',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();setResult(d);log(`What-if: ${d.overall}% — ${d.verdict}`,'ok');show(`What-if complete: ${d.overall}%`,'ok');}catch(e){log(`Error: ${e.message}`,'err');}
+    setLoading(false);
+  }
+  return<div>
+    <div style={{fontSize:'0.62rem',color:'var(--text3)',marginBottom:12}}>Add an extra reference and re-analyze instantly.</div>
+    <div style={{marginBottom:8}}><div className="field-label">EXTRA DOC ID</div><input className="text-inp" style={{width:200}} value={docId} onChange={e=>setDocId(e.target.value)}/></div>
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+      <div><div className="field-label">EXTRA REFERENCE TEXT</div><textarea rows={5} value={docTxt} onChange={e=>setDocTxt(e.target.value)} placeholder="Extra reference doc..."/></div>
+      <div><div className="field-label">SUBMISSION TO CHECK</div><textarea rows={5} value={subTxt} onChange={e=>setSubTxt(e.target.value)} placeholder="Paste submitted text..."/></div>
+    </div>
+    <button className="btn btn-purple" onClick={run} disabled={loading}>{loading?<span className="spin">⟳</span>:'⚡'} {loading?'Analyzing...':'Run What-If'}</button>
+    {result&&<div style={{marginTop:14}}><div style={{display:'flex',alignItems:'center',gap:12,marginBottom:10}}><div className="score-big" style={{color:SC(result.overall),fontSize:'2.5rem'}}>{result.overall}%</div><VTag v={result.verdict}/></div><CandTable data={result}/></div>}
+  </div>;
+}
+
+function App(){
+  const[tab,setTab]=useState('analyze');
+  const[subText,setSubText]=useState('');
+  const[data,setData]=useState(null);
+  const[loading,setLoading]=useState(false);
+  const[notif,show]=useNotif();
+  const[logs,log]=useLogs();
+  const[time,setTime]=useState(nowT());
+  useEffect(()=>{const t=setInterval(()=>setTime(nowT()),1000);return()=>clearInterval(t);},[]);
+  const overall=data?.overall;
+  const vc=overall!=null?SC(overall):'var(--text3)';
+
+  async function analyze(){
+    if(!subText.trim()){show('Paste text first','err');return;}
+    setLoading(true);setData(null);log('Analyzing submission...','info');
+    try{
+      const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:subText,top_k:5})});
+      if(!r.ok){const e=await r.json();throw new Error(e.detail||'Server error');}
+      const d=await r.json();setData(d);
+      log(`Done — ${d.overall}% | ${d.verdict} | ${d.total_sentences} sentences`,'ok');
+      show(`Analysis complete — ${d.overall}% plagiarism`,'ok');
+    }catch(e){log(`Error: ${e.message}`,'err');show(`✗ ${e.message}`,'err');}
+    setLoading(false);
+  }
+
+  function loadSample(){
+    setSubText(`Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.\nIt focuses on developing computer programs that can access data and use it to learn for themselves.\nScientists have developed many techniques for building intelligent systems.\nDeep learning is a subfield of machine learning that uses neural networks with many layers to analyze various factors of data.\nData preprocessing is an important step in the machine learning pipeline that involves transforming raw data into a clean and useful format.`);
+    show('Sample loaded — click Analyze','info');
+  }
+
+  const navItems=[{id:'analyze',icon:'🔍',l:'Analyze'},{id:'results',icon:'📊',l:'Results'},{id:'matches',icon:'⚠',l:'Matches'},{id:'corpus',icon:'+',l:'Corpus'},{id:'whatif',icon:'⚡',l:'What-If'},{id:'terminal',icon:'$',l:'Terminal'}];
+
+  return<div className="app">
+    {notif&&<div className={`notif ${notif.t==='ok'?'notif-ok':notif.t==='err'?'notif-err':'notif-info'}`}>{notif.m}</div>}
+    <div className="topbar">
+      <div style={{display:'flex',alignItems:'center',gap:16}}>
+        <div className="logo">Plagia<span>Guard</span><span className="badge">v2.0</span></div>
+        <div className="nav">{navItems.map(n=><button key={n.id} className={`nb ${tab===n.id?'active':''}`} onClick={()=>setTab(n.id)}>{n.icon} {n.l}</button>)}</div>
+      </div>
+      <div className="tr-right"><div style={{display:'flex',alignItems:'center',gap:5}}><div className="dot"/><span>API Online</span></div><span>{time}</span></div>
+    </div>
+    <div className="main">
+      <div className="sidebar">
+        <div style={{marginBottom:14}}><div className="sl">NAVIGATION</div>{navItems.map(n=><div key={n.id} className={`si ${tab===n.id?'active':''}`} onClick={()=>setTab(n.id)}><span>{n.icon}</span>{n.l}</div>)}</div>
+        <div style={{marginBottom:14}}><div className="sl">ALGORITHMS</div>{['KMP  O(n+m)','Rabin-Karp O(n+m)','Winnowing O(n)','MinHash/LSH O(n·k)','TF-IDF Cosine O(V)'].map(a=><div key={a} className="si" style={{fontSize:'0.63rem',cursor:'default',color:'var(--text3)'}}><span style={{color:'var(--accent)'}}>◆</span>{a}</div>)}</div>
+        <div className="sb-bottom"><div>Detection Result</div>{data?<div style={{marginTop:6,fontWeight:700,color:vc}}>{overall}% — {data.verdict?.split(' ').slice(1).join(' ')}</div>:<div style={{color:'var(--text3)',marginTop:4,fontSize:'0.6rem'}}>Not analyzed yet</div>}</div>
+      </div>
+      <div className="content">
+
+        {tab==='analyze'&&<div>
+          <div style={{display:'flex',gap:12,marginBottom:14,flexWrap:'wrap'}}>
+            <div style={{flex:1,minWidth:280}}>
+              <div className="field-label">PASTE SUBMISSION TEXT</div>
+              <textarea rows={9} value={subText} onChange={e=>setSubText(e.target.value)} placeholder="Paste the submitted document text here to check for plagiarism..."/>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:8,minWidth:150}}>
+              <button className="btn btn-primary" onClick={analyze} disabled={loading}>{loading?<span className="spin">⟳</span>:'🔍'} {loading?'Analyzing...':'Analyze'}</button>
+              <button className="btn btn-secondary" onClick={loadSample}>📄 Load Sample</button>
+              <button className="btn btn-secondary" onClick={()=>{setSubText('');setData(null);}}>↺ Clear</button>
+              {data&&<button className="btn btn-secondary" onClick={()=>setTab('results')}>📊 Results →</button>}
+            </div>
+          </div>
+          {data&&<>
+            <div className="panel">
+              <div className="ph"><div className="pt">Overall Result</div><VTag v={data.verdict}/></div>
+              <div className="pb" style={{display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}}>
+                <div><div className="score-big" style={{color:vc}}>{overall}%</div><div style={{fontSize:'0.8rem',fontWeight:700,color:vc,marginTop:4}}>{data.verdict}</div><div style={{fontSize:'0.6rem',color:'var(--text3)',marginTop:4}}>{data.total_sentences} sentences analyzed</div></div>
+                <div style={{flex:1}}><ScoreCards data={data}/></div>
+              </div>
+            </div>
+            <div className="panel">
+              <div className="ph"><div className="pt">⚠ KMP Matched Sentences</div><span className="tag tag-red">{data.candidates?.[0]?.kmp_matches?.length||0}</span></div>
+              <div className="pb" style={{padding:0}}><MatchList data={data}/></div>
+            </div>
+          </>}
+          <div className="panel"><div className="ph"><div className="pt">$ Activity Log</div></div><div className="pb"><TLog logs={logs}/></div></div>
+        </div>}
+
+        {tab==='results'&&<div>
+          {data?<>
+            <div className="two-col" style={{marginBottom:12}}>
+              <div className="panel"><div className="ph"><div className="pt">Overall Score</div></div><div className="pb" style={{textAlign:'center',padding:'24px'}}><div className="score-big" style={{color:vc,fontSize:'4rem'}}>{overall}%</div><div style={{fontSize:'0.8rem',fontWeight:700,color:vc,marginTop:8}}>{data.verdict}</div><div style={{fontSize:'0.6rem',color:'var(--text3)',marginTop:6}}>{data.total_sentences} sentences | {data.candidates?.length} docs</div></div></div>
+              <div className="panel"><div className="ph"><div className="pt">Algorithm Breakdown</div></div><div className="pb"><ScoreCards data={data}/></div></div>
+            </div>
+            <div className="panel"><div className="ph"><div className="pt">Per-Document Results</div></div><div className="pb" style={{padding:0}}><CandTable data={data}/></div></div>
+          </>:<div className="empty"><div className="empty-icon">📊</div><div>Run analysis on the Analyze tab first</div></div>}
+        </div>}
+
+        {tab==='matches'&&<div className="panel">
+          <div className="ph"><div className="pt">⚠ Matched Sentences</div>{data&&<span className="tag tag-red">{data.candidates?.[0]?.kmp_matches?.length||0} matched</span>}</div>
+          <div className="pb" style={{padding:0}}><MatchList data={data}/></div>
+        </div>}
+
+        {tab==='corpus'&&<div className="panel"><div className="ph"><div className="pt">+ Corpus Management</div></div><div className="pb"><IndexPanel log={log} show={show}/></div></div>}
+
+        {tab==='whatif'&&<div className="panel"><div className="ph"><div className="pt">⚡ What-If Analysis</div></div><div className="pb"><WhatIfPanel log={log} show={show}/></div></div>}
+
+        {tab==='terminal'&&<div className="panel"><div className="ph"><div className="pt">$ Terminal Log</div><span style={{fontSize:'0.62rem',color:'var(--text3)'}}>{logs.length} entries</span></div><div className="pb"><TLog logs={logs}/></div></div>}
+
+      </div>
+    </div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

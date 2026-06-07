@@ -1,0 +1,7 @@
+Data science is an interdisciplinary field that uses scientific methods processes algorithms and systems to extract knowledge from structured and unstructured data.
+Python is one of the most popular programming languages used in data science machine learning and artificial intelligence applications.
+Pandas is a powerful open source data manipulation and analysis library for Python that provides data structures and data analysis tools.
+Statistical analysis involves collecting analyzing interpreting presenting and organizing data to discover underlying patterns and trends in datasets.
+Big data refers to extremely large datasets that may be analyzed computationally to reveal patterns trends and associations especially relating to human behavior.
+Cloud computing is the on demand availability of computer system resources especially data storage and computing power without direct active management by the user.
+Database management systems are software systems used to store retrieve and run queries on data stored in a database for efficient data management.
