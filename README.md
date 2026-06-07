@@ -1,4 +1,4 @@
-# 🔍 Plagiarism Detector v2
+# 🔍 Plagiarism-Detector-String-Matching
 
 > A **complete, industry-oriented DSA project** implementing all PDF steps — KMP, Rabin-Karp, Winnowing Fingerprints, MinHash+LSH, TF-IDF Cosine, FastAPI REST API, React Dashboard, and 10 Unit Tests.
 
@@ -158,15 +158,6 @@ GET  /         → React dashboard
 | Day 4 | MinHash + LSH | `feat: MinHash signatures and LSH banding` |
 | Day 5 | TF-IDF + blended score + tests | `feat: TF-IDF cosine, blended score, 10 unit tests` |
 | Day 6 | FastAPI + dashboard + README | `docs: FastAPI API, React dashboard, full README` |
-
----
-
-## 🏷️ GitHub Tags
-```
-plagiarism-detector, kmp-algorithm, rabin-karp, winnowing,
-minhash, lsh, tfidf, string-matching, dsa, python,
-fastapi, react, college-project, text-processing
-```
 
 ---
 
